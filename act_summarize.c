@@ -1,6 +1,6 @@
 /* Print summary of match statistics to stdout
  * This file is part of jdupes; see jdupes.c for license information */
-
+#define restrict __restrict
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>

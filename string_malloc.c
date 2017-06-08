@@ -6,6 +6,8 @@
  * Released under The MIT License
  */
 
+#define restrict __restrict
+
 #include <stdlib.h>
 #include <stdint.h>
 #include "string_malloc.h"

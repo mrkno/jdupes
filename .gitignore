@@ -42,3 +42,10 @@ core
 
 # Mac OS
 .DS_Store
+
+# Visual Studio
+x64
+Release
+Debug
+.vs
+jdupes.vcxproj.user

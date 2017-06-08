@@ -8,7 +8,7 @@
  * Copyright (C) 2014-2017 by Jody Bruchon <jody@jodybruchon.com>
  * Released under The MIT License
  */
-
+#define restrict __restrict
 #include <stdio.h>
 #include <stdlib.h>
 #include "jody_hash.h"

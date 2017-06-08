@@ -6,7 +6,7 @@
  * If an error occurs or a cache is missing, zeroes are returned
  * Unified caches populate l1/l2/l3; split caches populate lXi/lXd instead
  */
-
+#define restrict __restrict
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

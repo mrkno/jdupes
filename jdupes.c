@@ -20,25 +20,25 @@
    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 
+#define restrict __restrict
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <dirent.h>
+#include "dirent.h"
 #include <signal.h>
-#include <unistd.h>
+#include <io.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
 #ifndef OMIT_GETOPT_LONG
- #include <getopt.h>
+ #include "getopt.h"
 #endif
 #include <string.h>
 #include <errno.h>
-#include <libgen.h>
-#include <sys/time.h>
 #include "jdupes.h"
 #include "string_malloc.h"
 #include "jody_hash.h"
@@ -53,6 +53,80 @@
 #include "act_linkfiles.h"
 #include "act_printmatches.h"
 #include "act_summarize.h"
+
+
+#include <Windows.h>
+#include <stdint.h> // portable: uint64_t   MSVC: __int64 
+
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+
+// MSVC defines this in winsock2.h!?
+typedef struct timeval {
+	long tv_sec;
+	long tv_usec;
+} timeval;
+
+int gettimeofday(struct timeval * tp, struct timezone * tzp)
+{
+	// Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
+	// This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
+	// until 00:00:00 January 1, 1970 
+	static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
+
+	SYSTEMTIME  system_time;
+	FILETIME    file_time;
+	uint64_t    time;
+
+	GetSystemTime(&system_time);
+	SystemTimeToFileTime(&system_time, &file_time);
+	time = ((uint64_t)file_time.dwLowDateTime);
+	time += ((uint64_t)file_time.dwHighDateTime) << 32;
+
+	tp->tv_sec = (long)((time - EPOCH) / 10000000L);
+	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
+	return 0;
+}
+
+
+#if defined _WIN32 || defined __WIN32__ || defined __EMX__ || defined __DJGPP__
+/* Win32, OS/2, DOS */
+# define HAS_DEVICE(P) \
+((((P)[0] >= 'A' && (P)[0] <= 'Z') || ((P)[0] >= 'a' && (P)[0] <= 'z')) \
+&& (P)[1] == ':')
+# define FILESYSTEM_PREFIX_LEN(P) (HAS_DEVICE (P) ? 2 : 0)
+# define ISSLASH(C) ((C) == '/' || (C) == '\\')
+#endif
+
+#ifndef FILESYSTEM_PREFIX_LEN
+# define FILESYSTEM_PREFIX_LEN(Filename) 0
+#endif
+
+#ifndef ISSLASH
+# define ISSLASH(C) ((C) == '/')
+#endif
+
+char *
+basename(char const *name)
+{
+	char const *base = name += FILESYSTEM_PREFIX_LEN(name);
+	int all_slashes = 1;
+	char const *p;
+
+	for (p = name; *p; p++)
+	{
+		if (ISSLASH(*p))
+			base = p + 1;
+		else
+			all_slashes = 0;
+	}
+
+	/* If NAME is all slashes, arrange to return `/'. */
+	if (*base == '\0' && ISSLASH(*name) && all_slashes)
+		--base;
+
+	return (char *)base;
+}
 
 
 /* Detect Windows and modify as needed */
@@ -979,7 +1053,7 @@ static hash_t *get_filehash(const file_t * const restrict checkfile,
   /* Actually seek past the first chunk if applicable
    * This is part of the filehash_partial skip optimization */
   if (ISFLAG(checkfile->flags, F_HASH_PARTIAL)) {
-    if (fseeko(file, PARTIAL_HASH_SIZE, SEEK_SET) == -1) {
+    if (fseek(file, PARTIAL_HASH_SIZE, SEEK_SET) == -1) {
       fclose(file);
       fprintf(stderr, "\nerror seeking in file "); fwprint(stderr, checkfile->d_name, 1);
       return NULL;

@@ -11,6 +11,7 @@
  #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#define restrict __restrict
 
 /* Convert NT epoch to UNIX epoch */
 static time_t nttime_to_unixtime(const uint64_t * const restrict timestamp)

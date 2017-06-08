@@ -4,6 +4,8 @@
 #ifndef JDUPES_H
 #define JDUPES_H
 
+#define restrict __restrict
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,7 +13,7 @@ extern "C" {
 #include <limits.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <io.h>
 #include "string_malloc.h"
 #include "jody_hash.h"
 #include "jody_sort.h"

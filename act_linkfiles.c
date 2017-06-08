@@ -2,7 +2,7 @@
  * This file is part of jdupes; see jdupes.c for license information */
 
 #include "jdupes.h"
-
+#define restrict __restrict
 #if !defined NO_HARDLINKS || !defined NO_SYMLINKS
 #include <stdio.h>
 #include <stdlib.h>

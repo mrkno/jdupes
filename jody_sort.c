@@ -3,7 +3,7 @@
  * Copyright (C) 2014-2017 by Jody Bruchon <jody@jodybruchon.com>
  * Released under The MIT License
  */
-
+#define restrict __restrict
 #include <stdlib.h>
 #include "jody_sort.h"
 

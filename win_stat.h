@@ -38,7 +38,7 @@ struct winstat {
 #define WS_ISTEMP(mode) ((mode & FILE_ATTRIBUTE_TEMPORARY) ? 1 : 0)
 #define WS_ISREG(mode) ((mode & FILE_ATTRIBUTE_DIRECTORY) ? 0 : 1)
 
-extern int win_stat(const char * const filename, struct winstat * const restrict buf);
+extern int win_stat(const char * const filename, struct winstat * const __restrict buf);
 
 #ifdef __cplusplus
 }
