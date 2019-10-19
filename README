@@ -1,3 +1,8 @@
+========================================================================
+= jdupes now has a native port, see https://github.com/jbruchon/jdupes =
+=                    This port is now deprecated.                      =
+========================================================================
+
 This fork of jdupes enables compiling on MSVC using Visual Studio 2017.  
 Some ugly hacks have been used to enable this to work...
 
